@@ -125,16 +125,23 @@ variable "georeplications" {
   description = <<DESC
   A list of Azure locations where the Ccontainer Registry should be geo-replicated. Only activated on Premium SKU.
   Supported properties are:
-    location                  = string
-    zone_redundancy_enabled   = bool
-    regional_endpoint_enabled = bool 
+    location                        = string
+    zone_redundancy_enabled         = bool
+    global_endpoint_routing_enabled = bool
+    regional_endpoint_enabled       = bool (deprecated; accepted for backwards compatibility)
 DESC
   type = list(object({
-    location                  = string
-    zone_redundancy_enabled   = bool
-    regional_endpoint_enabled = bool
+    location                        = string
+    zone_redundancy_enabled         = bool
+    global_endpoint_routing_enabled = optional(bool)
+    regional_endpoint_enabled       = optional(bool)
   }))
   default = []
+
+  validation {
+    condition     = alltrue([for replication in var.georeplications : replication.global_endpoint_routing_enabled != null || replication.regional_endpoint_enabled != null])
+    error_message = "Each georeplications entry must set global_endpoint_routing_enabled. regional_endpoint_enabled remains accepted for backwards compatibility."
+  }
 }
 
 variable "images_retention_enabled" {

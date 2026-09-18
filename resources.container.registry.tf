@@ -24,10 +24,10 @@ resource "azurerm_container_registry" "container_registry" {
     for_each = var.georeplications != null && var.sku == "Premium" ? var.georeplications : []
 
     content {
-      location                  = try(georeplications.value.location, georeplications.value)
-      zone_redundancy_enabled   = try(georeplications.value.zone_redundancy_enabled, null)
-      regional_endpoint_enabled = try(georeplications.value.regional_endpoint_enabled, null)
-      tags                      = merge({ "Name" = format("%s", "georep-acr-${georeplications.value.location}") }, var.add_tags, )
+      location                        = try(georeplications.value.location, georeplications.value)
+      zone_redundancy_enabled         = try(georeplications.value.zone_redundancy_enabled, null)
+      global_endpoint_routing_enabled = try(georeplications.value.global_endpoint_routing_enabled, georeplications.value.regional_endpoint_enabled)
+      tags                            = merge({ "Name" = format("%s", "georep-acr-${georeplications.value.location}") }, var.add_tags, )
     }
   }
 
